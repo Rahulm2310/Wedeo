@@ -1,4 +1,4 @@
-import {CREATE_MEET,JOIN_MEET,MEET_ERROR,CREATED_MEET,UPDATE_MEET,DELETE_MEET} from './types';
+import {CREATE_MEET,MEET_ERROR,CREATED_MEET,UPDATE_MEET,DELETE_MEET,GET_USER_MEETINGS,LOAD_ERROR,USER_MEETINGS_SUCCESS} from './types';
 import {v4 as uuidv4} from 'uuid';
 import {database,auth} from '../../firebase/firebaseApp';
 import { setAlert } from '../alert/actions';
@@ -25,7 +25,6 @@ export const createMeeting = ({title,datetime})=>async(dispatch)=>{
             dispatch(setAlert('Meeting created successfully','success'));
             return {id,password};
     } catch (error) {
-        console.log(error);
         dispatch(setAlert('Error creating meeting. Please try again','warning'));
         dispatch({
             type:MEET_ERROR,
@@ -47,7 +46,6 @@ export const updateMeeting = (meeting)=>async (dispatch)=>{
         dispatch(setAlert('Meeting updated successfully','success'));
 
     } catch (error) {
-        console.log(error);
         dispatch(setAlert('Failed to update meeting. Please try again','warning'));
         dispatch({
             type:MEET_ERROR,
@@ -76,7 +74,6 @@ export const deleteMeeting = (id)=>async(dispatch)=>{
 export const isValidMeeting = (id,pass)=>async(dispatch)=>{
     try {
         const meeting = await database.ref('/meetings/'+id).once('value');
-        console.log(id,pass,meeting.val());
         if(!meeting.exists()){
             dispatch(setAlert('Invalid Meeting Id or Password','error'));
             return {
@@ -84,7 +81,6 @@ export const isValidMeeting = (id,pass)=>async(dispatch)=>{
             }
         }else{
             const meet = meeting.val();
-            console.log(meet);
             if(meet.password===pass){
                 if(new Date()<=new Date(meet.datetime)){
                     dispatch(setAlert('Meeting has not started yet','error'));
@@ -104,7 +100,6 @@ export const isValidMeeting = (id,pass)=>async(dispatch)=>{
             }
         }
     } catch (error) {
-        console.log(error);
         dispatch(setAlert('Unable to join meeting. Please try again','error'));
         
     }
@@ -112,7 +107,6 @@ export const isValidMeeting = (id,pass)=>async(dispatch)=>{
 
 export const startMeeting = (meeting) => async (dispatch) => {
     try {
-        console.log("start meet :",meeting);
         const meet = {...meeting,startedAt:new Date().toString()};
         await database.ref('/meetings/'+meeting.id).set(meet);
         // console.log(meet);
@@ -122,14 +116,12 @@ export const startMeeting = (meeting) => async (dispatch) => {
         });
         dispatch(setAlert('Meeting Started','success'));
     } catch (error) {
-        console.log(error);
         dispatch(setAlert('Failed to start meeting. Please try again','error'));
     }
 }
 
 export const endMeeting = (meeting) => async (dispatch)  => {
     try {
-        console.log("end meet :",meeting);
         const meet = {...meeting,endedAt:new Date().toString()};
         await database.ref('/meetings/'+meeting.id).set(meet);
         dispatch({
@@ -138,7 +130,30 @@ export const endMeeting = (meeting) => async (dispatch)  => {
         });
         dispatch(setAlert('Meeting Ended','success'));
     } catch (error) {
-        console.log(error);
         dispatch(setAlert('Failed to end meeting. Please try again','error'));
+    }
+}
+
+export const fetchUserMeetings =(uid)=> async(dispatch)=>{
+    try {
+        dispatch({
+            type:GET_USER_MEETINGS
+        })
+        let meetings = [];
+        await database.ref('/meetings').orderByChild('hostId').equalTo(uid).once('value',
+        (snapshot)=>{
+            const obj = snapshot.val();
+            meetings = Object.values(obj);
+        });
+        dispatch({
+            type:USER_MEETINGS_SUCCESS,
+            payload:meetings
+        })
+    } catch (error) {
+        dispatch({
+            type:LOAD_ERROR,
+            payload:"Failed to load meetings. Please refresh and try again"
+        });
+        dispatch(setAlert("Failed to load meetings. Please refresh and try again",'error'));
     }
 }

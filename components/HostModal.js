@@ -16,7 +16,9 @@ const HostModal = ({show,onClose,createMeeting,setAlert,loading,user,edit,mId,up
     useEffect(()=>{
         if(edit){
             const m = meetings.filter(meet=>meet.id===mId)[0];
-            setMeeting({title:m.title,datetime:m.datetime,id:'',password:m.password});
+            if(m){
+                setMeeting({title:m.title,datetime:m.datetime,id:'',password:m.password});
+            }         
         }
     },[]);
 

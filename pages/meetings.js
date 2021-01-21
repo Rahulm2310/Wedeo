@@ -7,13 +7,20 @@ import Navbar from '../components/Navbar';
 import Spinner from '../components/Spinner';
 import styles from '../styles/Meetings.module.css';
 import MeetingCard from '../components/MeetingCard';
-import { setAlert } from '../redux/alert/actions';
+import { fetchUserMeetings } from '../redux/meeting/actions';
 
-const Meetings = ({meeting}) => {
+const Meetings = ({meeting,user,fetchUserMeetings}) => {
     const {meetings,loading,error} = meeting;
     const [activeIndex,setActiveIndex]=useState(0);
     const [upcoming,setUpcoming] = useState([]);
     const [past,setPast] = useState([]);
+
+    useEffect(()=>{
+        const getMeetings = async()=>{
+            await fetchUserMeetings(user.uid);
+        }
+        getMeetings();
+    },[]);
 
     useEffect(()=>{
         let upc=[];
@@ -27,7 +34,7 @@ const Meetings = ({meeting}) => {
         });
         setUpcoming(upc);
         setPast(pst);
-    },[]);
+    },[meetings])
 
     return <BaseLayout>
     <AuthContainer>
@@ -36,6 +43,7 @@ const Meetings = ({meeting}) => {
         <BackButton route="/dashboard"/>
         <div className={styles.header}>
         <h1 className={styles.heading}>My Meetings</h1>
+       
         <div className={styles.buttonRow}>
         <div className={activeIndex==0 ? `${styles.filterButton} ${styles.activeButton}`:styles.filterButton} onClick={()=>{setActiveIndex(0)}}>
             Upcoming
@@ -45,22 +53,26 @@ const Meetings = ({meeting}) => {
         </div>
         </div>
         </div>
-        {meetings.length>0?
+        {loading?<Spinner/>:<>
+        {/* {meetings.length>0? */}
         <div className={styles.meetingList}>{
             activeIndex==0?
             (upcoming.length>0? (upcoming.map(meet=><MeetingCard key={meet.id} meeting={meet}/>)): (<div className={styles.noMeetings}><img src="/static/images/my-meetings.svg" alt="no-meetings"/> No upcoming meetings. Host Now!</div>)):
-            (past.length>0? (past.map(meet=><MeetingCard key={meet.id} meeting={meet}/>)): (<div className={styles.noMeetings}>No past meetings</div>))
+            (past.length>0? (past.map(meet=><MeetingCard key={meet.id} meeting={meet}/>)): (<div className={styles.noMeetings}><img src="/static/images/my-meetings.svg" alt="no-meetings"/>No hosted meetings. Host Now!</div>))
         }     
-        </div>:
+        </div>
+        {/* :
         <div className={styles.noMeetings}>No meetings scheduled</div>
-        }
+        } */}
+    </>}
     </div>
     </AuthContainer>
     </BaseLayout>
 }
 
-const mapStateToProps = ({meeting})=>({
-    meeting
+const mapStateToProps = ({meeting,auth})=>({
+    meeting,
+    user:auth.user
 });
 
-export default connect(mapStateToProps,null)(Meetings);
+export default connect(mapStateToProps,{fetchUserMeetings})(Meetings);
