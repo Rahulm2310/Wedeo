@@ -19,7 +19,6 @@
   border-radius: 30px;
   padding: 30px;
   position: relative;
-  animation: 0.4s zoomIn ease-in-out;
 }
 
 .head {
