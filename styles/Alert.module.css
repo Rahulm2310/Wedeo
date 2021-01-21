@@ -1,0 +1,249 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700');
+
+.close {
+  float: right;
+  font-size: 21px;
+  font-weight: bold;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  opacity: 0.2;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.close {
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  -webkit-appearance: none;
+}
+
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  position: fixed !important;
+  z-index: 999;
+  right: 10px;
+  top: 10px;
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.11);
+}
+
+.alert .h4 {
+  margin-top: 0;
+  color: inherit;
+}
+
+.alert .alert-link {
+  font-weight: bold;
+}
+
+.alert > .p,
+.alert > .ul {
+  margin-bottom: 0;
+}
+
+.alert > .p + .p {
+  margin-top: 5px;
+}
+
+.alertDismissable {
+  padding-right: 35px;
+}
+
+.alertDismissable .close {
+  position: relative;
+  top: -2px;
+  right: -21px;
+  color: inherit;
+}
+
+.alertSuccess {
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+  color: #3c763d;
+}
+
+.alertSuccess hr {
+  border-top-color: #c9e2b3;
+}
+
+.alertSuccess .alertLink {
+  color: #2b542c;
+}
+
+.alertInfo {
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+  color: #31708f;
+}
+
+.alertInfo .hr {
+  border-top-color: #a6e1ec;
+}
+
+.alertInfo .alertLink {
+  color: #245269;
+}
+
+.alertWarning {
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+  color: #8a6d3b;
+}
+
+.alertWarning .hr {
+  border-top-color: #f7e1b5;
+}
+
+.alertWarning .alertLink {
+  color: #66512c;
+}
+
+.alertDanger {
+  background-color: #f2dede;
+  border-color: #ebccd1;
+  color: #a94442;
+}
+
+.alertDanger .hr {
+  border-top-color: #e4b9c0;
+}
+
+.alertDanger .alertLink {
+  color: #843534;
+}
+
+/* .alert {
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.11);
+} */
+
+.alert .sign {
+  font-size: 20px;
+  vertical-align: middle;
+  margin-right: 5px;
+  text-align: center;
+  width: 25px;
+  display: inline-block;
+}
+
+.alertSuccess {
+  background-color: #dbf6d3;
+  border-color: #aed4a5;
+  color: #569745;
+}
+
+.alertInfo {
+  background-color: #d9edf7;
+  border-color: #98cce6;
+  color: #3a87ad;
+}
+
+.alertWarning {
+  background-color: #fcf8e3;
+  border-color: #f1daab;
+  color: #c09853;
+}
+
+.alertDanger {
+  background-color: #f2dede;
+  border-color: #e0b1b8;
+  color: #b94a48;
+}
+
+.alertWhite {
+  background-image: linear-gradient(to bottom, #ffffff, #f9f9f9);
+  border-top-color: #d8d8d8;
+  border-bottom-color: #bdbdbd;
+  border-left-color: #cacaca;
+  border-right-color: #cacaca;
+  color: #404040;
+  padding-left: 61px;
+  position: relative;
+}
+
+.alertWhiteIcon {
+  text-align: center;
+  width: 45px;
+  height: 100%;
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  border: 1px solid #bdbdbd;
+}
+
+.alertWhiteIcon:after {
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  display: block;
+  content: '';
+  width: 10px;
+  height: 10px;
+  border: 1px solid #bdbdbd;
+  position: absolute;
+  border-left: 0;
+  border-bottom: 0;
+  top: 50%;
+  right: -6px;
+  margin-top: -5px;
+  background: #fff;
+}
+
+.alertWhite.rounded {
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+}
+
+.roundedIcon {
+  border-radius: 3px 0 0 3px;
+  -webkit-border-radius: 3px 0 0 3px;
+}
+
+.alertWhiteIconI {
+  font-size: 20px;
+  color: #fff;
+  left: 12px;
+  margin-top: -10px;
+  position: absolute;
+  top: 50%;
+}
+
+.alertDangerIcon,
+.alertDangerIcon:after {
+  border-color: #ca452e;
+  background: #da4932;
+}
+
+.alertInfoIcon,
+.alertInfoIcon:after {
+  border-color: #3a8ace;
+  background: #4d90fd;
+}
+
+.alertWarningIcon,
+.alertWarningIcon:after {
+  border-color: #d68000;
+  background: #fc9700;
+}
+
+.alertSuccessIcon,
+.alertSuccessIcon:after {
+  border-color: #54a754;
+  background: #60c060;
+}

@@ -3,13 +3,27 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.js",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
+    "express": "^4.17.1",
+    "firebase": "^8.2.2",
+    "moment": "^2.29.1",
     "next": "10.0.5",
+    "peerjs": "^1.3.1",
     "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react-datetime": "^3.0.4",
+    "react-dom": "17.0.1",
+    "react-redux": "^7.2.2",
+    "react-share": "^4.3.1",
+    "redux": "^4.0.5",
+    "redux-devtools-extension": "^2.13.8",
+    "redux-persist": "^6.0.0",
+    "redux-thunk": "^2.3.0",
+    "socket.io": "^3.1.0",
+    "socket.io-client": "^3.1.0",
+    "uuid": "^8.3.2"
   }
 }

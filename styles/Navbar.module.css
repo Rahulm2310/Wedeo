@@ -1,0 +1,82 @@
+.navbar {
+  background-color: white !important;
+  border: none;
+  padding: 10px 20px;
+  width: 100%;
+  z-index: 1;
+  box-shadow: 0px 0px 10px #ccc;
+}
+
+.navbarBrand {
+  color: #000 !important;
+  font-family: 'Lobster', cursive;
+  font-size: 30px;
+}
+
+.navLink a {
+  color: #000 !important;
+  font-size: 18px;
+}
+
+/* .navLink::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 2px;
+  background: grey;
+  transition: width 0.3s;
+} */
+
+/* .navLink:hover::after {
+  width: 100%;
+} */
+
+.navRight {
+  position: absolute;
+  right: 40px;
+  top: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.user {
+  font-size: 22px;
+}
+
+.user span {
+  text-transform: capitalize;
+  font-family: 'Lobster', cursive;
+}
+
+.logOutBtn {
+  border: 1.5px solid black;
+  background: transparent;
+  border-radius: 20px;
+  padding: 5px 10px;
+  margin-left: 20px;
+}
+
+.logOutBtn:hover {
+  background: black;
+  color: white;
+}
+
+@media screen and (max-width: 500px) {
+  .user span {
+    display: none;
+  }
+  .navbar {
+    padding: 10px;
+  }
+  .navRight {
+    right: 10px;
+    display: flex;
+    align-items: center;
+  }
+  .navRight i {
+    font-size: 28px;
+  }
+  .logOutBtn {
+    margin-left: 10px;
+  }
+}

@@ -1,65 +1,100 @@
 import Head from 'next/head'
+import {useRouter} from 'next/router';
+import BaseLayout from '../components/BaseLayout'
 import styles from '../styles/Home.module.css'
+import Image from 'next/image';
+import { useEffect } from 'react';
+import { connect } from 'react-redux';
 
-export default function Home() {
+const Home = ({isAuthenticated})=> {
+  const router=useRouter();
+  useEffect(()=>{
+    if(isAuthenticated){
+      router.push('/dashboard');
+    }
+  },[isAuthenticated]);
   return (
-    <div className={styles.container}>
+    <div className={styles.homeContainer}>
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
+        <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
       </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
+      <BaseLayout>
+      <nav className={`navbar ${styles.navbar} navbar-default`}>
+      <div class="container-fluid">
+        <div className={`navbar-header`}>
+          <button
+            type="button"
+            class="navbar-toggle collapsed"
+            data-toggle="collapse"
+            data-target="#bs-example-navbar-collapse-1"
+            aria-expanded="false"
           >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a className={`${styles.navbarBrand} navbar-brand`} href="#">Wedeo</a>
         </div>
-      </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li className={`${styles.navLink} nav-link`} data-toggle="modal" data-target="#joinModal">
+              <a href="/signin">Login</a>
+            </li>
+            <li className={`${styles.navLink} nav-link`} data-toggle="modal" data-target="#createModal">
+              <a href="/signin">Sign Up</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+      <div className={styles.header}></div>
+      <div className={styles.banner}>
+      <div>
+        <h1 className={styles.bannerHead}>Let's Connect</h1>
+        <p className={styles.bannerLead}>Video. Chat. Fun</p>
+      </div>
+      <div className={styles.bannerImg}>
+        <img src='/static/images/video-call.svg' alt="banner-image" />
+      </div>
+    </div>
+    <div class="content">
+      <div className={`${styles.contentItem} row`} >
+        <div className={styles.contentImg}>
+          <img className={styles.contentImgImg} src="/static/images/world-connected.svg" alt="world-connected" />
+        </div>
+        <div className={styles.headText}>Keeping the world connected</div>
+      </div>
+      <div className={styles.contentItem} >
+        <div className={styles.headText}>Host your business meetings</div>
+        <div className={styles.contentImg}>
+          <img className={styles.contentImgImg} src="/static/images/business-meeting.svg" alt="business" />
+        </div>
+      </div>
+      <div className={styles.contentItem} >
+        <div className={styles.contentImg}>
+          <img className={styles.contentImgImg} src="/static/images/webinar.svg" alt="webinar" />
+        </div>
+        <div className={styles.headText}>Conduct your events and webinars</div>
+      </div>
+      <div className={styles.contentItem} >
+        <div className={styles.headText}>Hangout with your friends and family</div>
+
+        <div className={styles.contentImg}>
+          <img className={styles.contentImgImg} src="/static/images/group-hangout.svg" alt="friends" />
+        </div>
+      </div>
+    </div>
+    </BaseLayout>
     </div>
   )
 }
+
+const mapStateToProps = ({auth})=>({
+  isAuthenticated:auth.isAuthenticated
+});
+
+export default connect(mapStateToProps,null)(Home);

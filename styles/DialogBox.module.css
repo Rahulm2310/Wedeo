@@ -1,0 +1,46 @@
+.overlay {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.dialogBox {
+  background: white;
+  border-radius: 20px;
+  padding: 10px 20px;
+}
+
+.question {
+  font-size: 16px;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.okBtn {
+  border-radius: 10px;
+  background: linear-gradient(to right, #000046, #1cb5e0);
+  padding: 7px 15px;
+  color: white;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.cancelBtn {
+  border-radius: 10px;
+  background: linear-gradient(to right, #1e2730, #a6a7a8);
+  padding: 7px 15px;
+  color: white;
+  cursor: pointer;
+}

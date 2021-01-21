@@ -1,0 +1,203 @@
+.container {
+  width: 90%;
+  margin: 0px auto;
+  margin-bottom: 50px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.heading {
+  font-size: 24px;
+}
+
+.buttonRow {
+  display: flex;
+  align-items: center;
+}
+
+.filterButton {
+  padding: 5px 15px;
+  border-radius: 20px;
+  border: 1px solid grey;
+  font-size: 14px;
+  cursor: pointer;
+  color: grey;
+  transition: 0.2s background ease-in-out;
+  margin-right: 10px;
+}
+
+.filterButton:hover,
+.activeButton {
+  background: linear-gradient(to right, #020292, #1cb5e0);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0px 10px 10px #ddd;
+}
+
+.meetingList {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  border: none;
+}
+
+.card {
+  width: 30%;
+  /* height: 300px; */
+  overflow: hidden;
+  box-shadow: 0px 0px 20px #ccc;
+  border-radius: 20px;
+  margin-right: 20px;
+  margin-top: 20px;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  transition: 0.2s ease-in all;
+}
+
+.cardImg {
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(to right, #3a7bd5, #00d2ff);
+  position: relative;
+  transition: 0.2s background ease-in-out;
+}
+
+.cardImgImg {
+  width: 100%;
+  height: 100%;
+}
+
+.cardContent {
+  padding: 10px 20px;
+}
+
+.meta {
+  margin-bottom: 5px;
+}
+
+.created {
+  font-size: 12px;
+  color: #aaa;
+  text-align: right;
+}
+
+.socialShare {
+  padding: 5px;
+  background: linear-gradient(to right, #3a7bd5, #00d2ff);
+  display: flex;
+  justify-content: center;
+  /* align-items: center; */
+}
+
+.socialIcon {
+  margin: 0px 5px;
+}
+
+.editButton {
+  padding: 10px 15px;
+  background: white;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border-radius: 50%;
+  font-size: 16px;
+  z-index: 99;
+}
+
+/* .editButton i {
+  font-family: none;
+} */
+
+.editButton:hover {
+  color: white;
+  background: black;
+}
+
+.deleteButton {
+  padding: 10px 15px;
+  background: white;
+  cursor: pointer;
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  border-radius: 50%;
+  font-size: 16px;
+  z-index: 99;
+}
+
+.deleteButton:hover {
+  color: white;
+  background: rgb(238, 4, 4);
+}
+
+.noMeetings {
+  font-size: 24px;
+  color: #ccc;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  text-align: center;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.noMeetings img {
+  width: 30%;
+  filter: grayscale(0.9);
+  opacity: 0.5;
+}
+
+.overlay {
+  display: none;
+  transition: 0.2s background ease-in-out;
+}
+
+.cardImg:hover .overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9;
+  transition: 0.2s all ease-in-out;
+}
+
+.startButton {
+  border: 2px solid white;
+  color: white;
+  border-radius: 20px;
+  padding: 7px 15px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.startButton:hover {
+  background: white;
+  color: black;
+  transition: 0.2s all ease-in-out;
+}
+
+@media screen and (max-width: 600px) {
+  .container {
+    width: 95%;
+  }
+  .card {
+    width: 100%;
+    margin-right: 0px;
+  }
+  .noMeetings img {
+    width: 100%;
+  }
+}

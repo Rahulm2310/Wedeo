@@ -1,0 +1,107 @@
+.modalBack {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.623);
+  z-index: 99;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+  /* animation: 5s fadeIn ease-in-out; */
+}
+
+.modal {
+  background: white;
+  box-shadow: 0px 0px 50px black;
+  border-radius: 30px;
+  padding: 30px;
+  position: relative;
+  animation: 0.4s zoomIn ease-in-out;
+}
+
+.head {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.form {
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 20px;
+  width: 300px;
+  height: 100%;
+  text-align: center;
+}
+
+.input {
+  background-color: #eee;
+  border: none;
+  padding: 12px 15px;
+  margin: 8px 0;
+  width: 100%;
+}
+
+.button {
+  border-radius: 20px;
+  border: 1px solid white;
+  background: linear-gradient(to right, #0537c0, #1cb5e0);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 12px 45px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: transform 80ms ease-in;
+}
+
+.button:active {
+  transform: scale(0.95);
+}
+
+.button:focus {
+  outline: none;
+}
+
+.crossBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 20px;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.crossBtn:hover {
+  color: grey;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes zoomIn {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(0.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
