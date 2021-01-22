@@ -13,8 +13,9 @@ import moment from 'moment';
 import DialogBox from '../components/DialogBox';
 import {io} from 'socket.io-client';
 import { clearMessages, updateMessages,updateUsers,removeUser,clearUsers } from '../redux/messages/actions';
+import { setAlert } from '../redux/alert/actions';
 
-const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessages,removeUser,updateUsers,clearUsers,messages,users}) => {
+const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessages,removeUser,updateUsers,clearUsers,messages,users,setAlert}) => {
     // console.log(users);
     const router = useRouter();
     const [meeting,setMeeting] = useState(null);
@@ -43,13 +44,14 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
         // console.log(`${user.name} has left the meeting`);
     });
 
-    // useEffect(()=>{
-    //     console.log(users);
-    // },[users])
+    socket.on('meeting-ended',()=>{
+        setAlert('Host has ended the meeting','info');
+        router.push('/dashboard');
+    });
+
 
     useEffect(()=>{    
         socket.on('user-message',msg=>{
-            console.log('new message : ',msg);
             updateMessages(msg);
         });
     },[])
@@ -220,10 +222,13 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
         setIsChat(!isChat);
     }
 
-    const endMeetingHandler = async ()=>{
-        await endMeeting(meeting);
-        clearMessages();
-        router.push('/dashboard');
+    const endMeetingHandler = ()=>{
+        socket.emit('end-meet',query.id,async ()=>{
+            await endMeeting(meeting);
+            clearMessages();
+            router.push('/dashboard');
+            console.log("in callback");
+        });  
     }
 
     const sendMessage = ()=>{
@@ -377,4 +382,4 @@ const mapStateToProps=({auth,messages})=>({
     users:messages.users
 });
 
-export default connect(mapStateToProps,{isValidMeeting,endMeeting,updateMessages,clearMessages,updateUsers,clearUsers,removeUser})(Meeting);
+export default connect(mapStateToProps,{isValidMeeting,endMeeting,updateMessages,clearMessages,updateUsers,clearUsers,removeUser,setAlert})(Meeting);

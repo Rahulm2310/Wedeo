@@ -88,9 +88,21 @@ export const isValidMeeting = (id,pass)=>async(dispatch)=>{
                         status:404,message:'failed'
                     }
                 }else{
-                    return {
-                        status:200,message:'success',data:meet
-                    }
+                    if(!meet.startedAt){
+                        dispatch(setAlert('Host has not started the meeting yet','info'));
+                        return {
+                            status:404,message:'failed'
+                        }
+                    }else if(meet.endedAt){
+                        dispatch(setAlert('Meeting ended by the host','info'));
+                        return {
+                            status:404,message:'failed'
+                        }
+                    }else{
+                        return {
+                            status:200,message:'success',data:meet
+                        }
+                    }      
                 }
             }else{
                 dispatch(setAlert('Invalid Meeting Id or Password','error'));
@@ -114,7 +126,7 @@ export const startMeeting = (meeting) => async (dispatch) => {
             type:UPDATE_MEET,
             payload:meet
         });
-        dispatch(setAlert('Meeting Started','success'));
+        // dispatch(setAlert('Meeting Started','success'));
     } catch (error) {
         dispatch(setAlert('Failed to start meeting. Please try again','error'));
     }

@@ -164,6 +164,7 @@
 
 .cardImg:hover .overlay {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   position: absolute;
@@ -181,6 +182,7 @@
   padding: 7px 15px;
   background: transparent;
   cursor: pointer;
+  margin-top: 10px;
 }
 
 .startButton:hover {
