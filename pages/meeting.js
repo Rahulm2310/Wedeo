@@ -14,9 +14,10 @@ import DialogBox from '../components/DialogBox';
 import {io} from 'socket.io-client';
 import { clearMessages, updateMessages,updateUsers,removeUser,clearUsers } from '../redux/messages/actions';
 import { setAlert } from '../redux/alert/actions';
+import Linkify from 'react-linkify';
+import Picker from 'emoji-picker-react';
 
 const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessages,removeUser,updateUsers,clearUsers,messages,users,setAlert}) => {
-    // console.log(users);
     const router = useRouter();
     const [meeting,setMeeting] = useState(null);
     const [loading,setLoading] = useState(true);
@@ -30,8 +31,10 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
     const [showDialog,setShowDialog] = useState(false);
     const [messageInput,setMessageInput] = useState('');
     const [myVideoStream,setMyVideoStream] = useState(null);
+    const [emojiPicker,setEmojiPicker] = useState(false);
 
     const peers = {};
+    let streams={};
 
     //socket.io
     const socket = io('/');
@@ -41,7 +44,7 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
             peers[user.uid].close();
         }
         removeUser(user);
-        // console.log(`${user.name} has left the meeting`);
+        updateUsers({...user,type:"leave",datetime:new Date()});
     });
 
     socket.on('meeting-ended',()=>{
@@ -52,17 +55,29 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
 
     useEffect(()=>{    
         socket.on('user-message',msg=>{
+            console.log("user message",msg);
             updateMessages(msg);
+        });
+
+        socket.on('update-streams',strms=>{
+            console.log("updating streams",strms);
+            streams=strms;
+        });
+
+        return (()=>{
+            leaveMeetingHandler();
+            console.log("use effect cleanup");
         });
     },[])
 
     //peerjs
     const setupVideoCall = async ()=>{
-        if(typeof window!='undefined'){
+        if(typeof window!="undefined"){
             const Peer = (await import('peerjs')).default;
             const myPeer = new Peer(user.uid);
             myPeer.on('open',id=>{
-                socket.emit('join-meet',query.id,{uid:id,name:user.name});
+                console.log("my peer open");
+                socket.emit('join-meet',{meetingId:query.id,user:{uid:id,name:user.name}});
             });
             
             const myVideo = document.createElement('video');
@@ -81,12 +96,11 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
     
             navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(stream=>{
                 setMyVideoStream(stream);
-                console.log(myVideoStream);
-                console.log("navigator .media devices .get user : ",user);
                 addVideoStream(myVideo,myVideoCard,stream);
-                updateUsers({uid:user.uid,name:user.name,joinedAt:new Date()},true);
-                myPeer.on('call',call=>{
+                updateUsers({uid:user.uid,name:user.name,type:"join",datetime:new Date()},true);
+                myPeer.on('call',(call)=>{
                     if(!peers[user.uid]){
+                        // socket.emit("new-stream",{meetingId:query.id,stream:stream.id, user: {uid:user.uid, name:user.name}});
                         call.answer(stream);
                         const video = document.createElement('video');
                         video.muted=true;
@@ -103,16 +117,18 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
                         videoCard.append(footer);
     
                         call.on('stream',(userVideoStream)=>{
+                            console.log("my peer call on stream", userVideoStream, streams[userVideoStream.id]);
+                            p.textContent=streams[userVideoStream.id].name;
                             addVideoStream(video,videoCard,userVideoStream);
                         });
+                        peers[user.uid]=call;
                     }
-                    
                 })
 
                 socket.on('user-joined',user=>{
-                    console.log("socket user joined :",user);
+                    console.log("user joined event");
                     connectToNewUser(user,stream);
-                    updateUsers({...user,joinedAt:new Date()});
+                    updateUsers({...user,type:"join",datetime:new Date()});
                 });
             });
 
@@ -121,21 +137,24 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
                 video.addEventListener('loadedmetadata',()=>{
                     video.play();
                 });
-                let videoGrid = document.getElementsByClassName('videos')[0];               
-                videoGrid.append(videoCard);
+                let videoGrid = document.getElementsByClassName('videos')[0]; 
+                if(videoGrid){              
+                    videoGrid.append(videoCard);
+                }
             }
 
             
-            const connectToNewUser = (user,stream)=>{
-                console.log("connect to new user : ",user);
-                const call = myPeer.call(user.uid,stream);
+            const connectToNewUser = (newuser,myStream)=>{
+                console.log("newuser joined event",newuser,myStream);
+                socket.emit("new-stream",{meetingId:query.id,stream:myStream.id,user:{id:user.uid, name:user.name}});
+                const call = myPeer.call(newuser.uid,myStream);
                 const video = document.createElement('video');
                 video.muted=true;
                 
                 const footer=document.createElement('div');
                 footer.classList.add([`${styles.footer}`]);
                 const p = document.createElement('p');
-                p.textContent=user.name;
+                p.textContent=newuser.name;
                 footer.append(p);
 
                 const videoCard = document.createElement('div');
@@ -148,13 +167,20 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
                 });
 
                 call.on('close',()=>{
+                    myStream.getTracks().forEach((track)=>{
+                        track.stop();
+                    });
                     videoCard.remove();
                 })
 
-                peers[user.uid]=call;
+                peers[newuser.uid]=call;
             }
         
         }
+    }
+
+    const emojiPickerHandler = (event,emoji)=>{
+        setMessageInput(messageInput+emoji.emoji);
     }
     
 
@@ -218,6 +244,12 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
         setIsIncomingAudio(!isIncomingAudio);
     }
 
+    const screenShareHandler = ()=>{
+        navigator.mediaDevices.getDisplayMedia().then(stream=>{
+            setMyVideoStream(stream);
+        });
+    }
+
     const chatHandler = ()=>{
         setIsChat(!isChat);
     }
@@ -226,8 +258,8 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
         socket.emit('end-meet',query.id,async ()=>{
             await endMeeting(meeting);
             clearMessages();
+            clearUsers();
             router.push('/dashboard');
-            console.log("in callback");
         });  
     }
 
@@ -246,8 +278,14 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
     }
 
     const leaveMeetingHandler = ()=>{
+        if(myVideoStream){
+            myVideoStream.getTracks().forEach((track)=>{
+                track.stop();
+            });
+        }
         socket.disconnect();
         clearMessages();
+        clearUsers();
         router.push('/dashboard');
     }
 
@@ -273,10 +311,10 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
 
                         <p><strong>Title</strong> : {meeting.title}</p>
                         <p><strong>Host</strong> : {meeting.hostName}</p>
-                        <p><strong>Users joined</strong></p>   
+                        <p><strong>User Activity Log</strong></p>   
                         <div className={styles.userList}>
                             {users && users.map(u=><div className={styles.userListUser}>
-                                <p><strong>{u.uid==user.uid?'You' : u.name}</strong> <span>joined at {moment(u.joinedAt).format('LT')}</span></p>
+                                <p><strong>{u.uid==user.uid?'You' : u.name}</strong> <span>{u.type==="join"?"joined":"left"} at {moment(u.datetime).format('LT')}</span></p>
                             </div>)}
                         </div>
                         <div className={styles.socialShare}>
@@ -291,14 +329,6 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
                 <div className={styles.meeting}>
                     <div className={styles.videoBox}>
                         <div className={`${styles.videos} videos`}>
-                        {/* <div className={styles.videoCard}>
-                            <div className={styles.footer}>
-                                <p>John Doe</p>
-                            <i class="fa fa-microphone" aria-hidden="true"></i>
-                            </div>
-                        </div> */}
-                       
-                            
                         </div>
                         <div className={styles.controls}>
                             <div className={styles.controlBtn} onClick={fullScreenHandler}>
@@ -318,6 +348,9 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
                                 {!isIncomingAudio? <i class="fas fa-volume-mute"></i>:
                                 <i class="fa fa-volume-up" aria-hidden="true"></i>
 }
+                            </div>
+                            <div className={styles.controlBtn} onClick={screenShareHandler}>
+                            <i class="fa fa-desktop" aria-hidden="true"></i>
                             </div>
                             <div className={styles.controlBtn} onClick={chatHandler}>
                                 {!isChat? <i class="fas fa-comment-slash"></i>:
@@ -348,13 +381,19 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
                             messages.map((m)=>
                             <div className={m.sender.uid==user.uid?`${styles.message} ${styles.myMessage}`:styles.message}>
                                 <div className={styles.messageSender}><i class="fa fa-user-circle-o" aria-hidden="true"></i> {m.sender.uid==user.uid? 'You' : m.sender.name}</div>
-                                <div className={styles.messageBody}>{m.body}</div>
+                                <div className={styles.messageBody}><Linkify>{m.body}</Linkify></div>
                                 <div className={styles.messageDate}>{moment(m.createdAt).format('LT')}</div>
                             </div>)
                         }
                         </div>
                         <div className={styles.input}>
+                            <div className={styles.msgInput}>
                             <input name="message" value={messageInput} onChange={(e)=>{setMessageInput(e.target.value)}} placeholder="Write your message here"/>
+                            <i class="fa fa-smile-o" aria-hidden="true" onClick={()=>setEmojiPicker(!emojiPicker)}></i>
+                            {typeof window!="undefined" && emojiPicker &&
+                            <Picker onEmojiClick={emojiPickerHandler} />
+}
+                            </div>
                             <button disabled={messageInput.trim().length==0} className={styles.sendBtn} onClick={sendMessage}>
                             <i class="fa fa-paper-plane" aria-hidden="true"></i>
                             </button>

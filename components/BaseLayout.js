@@ -1,11 +1,19 @@
 import React, { Fragment } from 'react'
+import { connect } from 'react-redux'
 import Meta from './Meta'
+import styles from '../styles/BaseLayout.module.css';
 
-export default function BaseLayout({children}) {
+const BaseLayout = ({children,isDarkMode}) => {
     return (
-        <div>
+        <div className={`${styles.baseLayout} ${isDarkMode?styles.baseLayoutDark:""}`}>
             <Meta/>
             <div>{children}</div>
         </div>
     )
 }
+
+const mapStateToProps = ({theme})=>({
+    isDarkMode:theme.isDarkMode
+});
+
+export default connect(mapStateToProps)(BaseLayout);

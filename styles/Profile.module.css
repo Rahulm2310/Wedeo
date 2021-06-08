@@ -1,0 +1,201 @@
+.profileCard{
+    background:#fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.205) ;
+    padding:40px;
+    border-radius: 20px;
+    width:40%;
+    margin:0px auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.editButton{
+    cursor: pointer;
+    position: absolute;
+    background: linear-gradient(to right, dodgerblue,lightblue);
+    border-radius: 50%;
+    padding:10px 15px;
+    color:white;
+    right:10px;
+    top:10px;
+    font-size: 18px;
+    transition: 0.2s ease-in-out all;
+}
+
+.editButton:hover{
+    transform:scale(0.95);
+}
+
+.profilePic{
+    width:150px;
+    height:150px;
+    border-radius: 50%;
+    box-shadow: 0px 0px 20px rgba(128, 128, 128, 0.329);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center
+}
+
+.profilePic input{
+    display: none;
+}
+
+.profilePic .camera{
+    color:gray;
+    font-size: 24px;
+    position: absolute;
+    bottom:20px;
+    right:0px;
+    cursor: pointer;
+}
+
+.profilePic .camera:hover{
+    color:rgba(0, 0, 0, 0.671);
+}
+
+.profilePicImage{
+    width:93%;
+    height:93%;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profilePicImage img{
+    width:100%;
+    height:100%;
+}
+
+.profilePicImage .userIcon{
+    font-size: 140px;
+    color:#ccc;
+}
+
+.userData{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.username{
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 20px;
+}
+
+.useremail{
+    font-size: 16px;
+    color:#999;
+}
+
+.meetingData{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.meetingDataBox{
+    padding:20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #DCEFFA;
+    border-radius: 10px;
+    /* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.151); */
+    margin:0px 5px;
+}
+
+.meetingDataBox p{
+    text-align: center;
+}
+
+.editUserData{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center
+}
+
+.editUserData .input{
+    background-color: #eee;
+  border: none;
+  padding: 12px 15px;
+  margin-top: 20px;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.editUserData .button {
+    border-radius: 20px;
+    /* border: 1px solid white; */
+    background: linear-gradient(to right, #0537c0, #1cb5e0);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in;
+    margin-top: 20px;
+    outline: none;
+    border:none;
+  }
+
+.editUserData .button:active{
+    transform: scale(0.95);
+}
+
+.editUserData .button:focus {
+  outline: none;
+}
+
+.deleteButton{
+    margin-top: 10px !important;
+    background: linear-gradient(to right, #e22200, #fa533d) !important;
+}
+
+/* dark mode styles */
+.profileCardDark{
+    background: #222222;
+  color:#ccc;
+}
+
+.profileCardDark .profilePic{
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.61);
+}
+
+.profileCardDark .meetingDataBox{
+    background: #3a3a3a;
+    color:#ccc;
+}
+
+.profileCardDark .editButton{
+    background: none;
+    color:#ccc;
+    border:2px solid #ccc;
+}
+
+.profileCardDark .input{
+    background: #3a3a3a;
+    color:#ccc;
+}
+
+.profileCardDark .button{
+    filter: grayscale(0.4);
+}
+
+
+@media screen and (max-width:720px){
+    .profileCard{
+        width: 80%;
+    }
+}

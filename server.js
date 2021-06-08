@@ -15,10 +15,12 @@ app.prepare().then(()=>{
     });
 
     let sockets = {};
+    let streams = {};
 
     io.on('connection',socket=>{
-        socket.on('join-meet',(meetingId,user)=>{
-            // console.log(meetingId,user);
+        socket.on('join-meet',(data)=>{
+            const {meetingId, user}=data;
+            console.log(meetingId,user);
             socket.join(meetingId);
             if(!sockets[meetingId]){
                 sockets[meetingId]=[];
@@ -32,6 +34,13 @@ app.prepare().then(()=>{
                     sockets[meetingId]=sockets[meetingId].filter(s=>s!=socket);
                 } 
             });
+            
+        });
+
+        socket.on('new-stream',(data)=>{
+            console.log("new stream",data);
+            streams[data.stream]=data.user;
+            socket.to(data.meetingId).emit("update-streams",streams);
         });
 
         socket.on('send-message',(meetingId,msg)=>{

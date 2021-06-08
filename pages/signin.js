@@ -9,7 +9,7 @@ import Footer from '../components/Footer';
 
 const SignIn = ({signUpUser,signInUser,signInWithGoogle,signInWithFacebook,auth}) => {
 const {isAuthenticated}=auth;
-const [activeIndex,setActiveIndex]=useState(0);
+const [activeIndex,setActiveIndex]=useState(1);
 const [signUpData,setSignUpData] = useState({name:'',email:'',password:''});
 const [signInData,setSignInData] = useState({email:'',password:''});
 
@@ -21,10 +21,10 @@ useEffect(()=>{
 },[isAuthenticated]);
 	
 const onClickSignUp = ()=>{
-    setActiveIndex(1);
+    setActiveIndex(0);
 }
 const onClickSignIn = ()=>{
-    setActiveIndex(0);
+    setActiveIndex(1);
 }
 
 const onSignUpHandler = async(e)=>{
@@ -106,7 +106,7 @@ const onChangeSignInData = (e)=>{
 </div>
 <div className={styles.mobileContainer}>
 <div className={styles.formContainer}>
-	{activeIndex==0?
+	{activeIndex==1?
 		<form action="#" className={styles.form} onSubmit={onSignInHandler}>
 			<h1 className={styles.h1}>Sign in</h1>
 			<div className={styles.socialContainer}>
@@ -144,7 +144,7 @@ const onChangeSignInData = (e)=>{
 		</div>
         </div>
 		
-		<Footer/>
+		{/* <Footer/> */}
 		</AuthContainer>
 		</BaseLayout>
     )

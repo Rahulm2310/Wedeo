@@ -9,7 +9,7 @@ import styles from '../styles/Meetings.module.css';
 import MeetingCard from '../components/MeetingCard';
 import { fetchUserMeetings } from '../redux/meeting/actions';
 
-const Meetings = ({meeting,user,fetchUserMeetings}) => {
+const Meetings = ({meeting,user,fetchUserMeetings,isDarkMode}) => {
     const {meetings,loading,error} = meeting;
     const [activeIndex,setActiveIndex]=useState(0);
     const [upcoming,setUpcoming] = useState([]);
@@ -39,7 +39,7 @@ const Meetings = ({meeting,user,fetchUserMeetings}) => {
     return <BaseLayout>
     <AuthContainer>
         <Navbar/>
-    <div className={styles.container}>
+    <div className={`${styles.container} ${isDarkMode?styles.containerDark:""}`}>
         <BackButton route="/dashboard"/>
         <div className={styles.header}>
         <h1 className={styles.heading}>My Meetings</h1>
@@ -70,9 +70,10 @@ const Meetings = ({meeting,user,fetchUserMeetings}) => {
     </BaseLayout>
 }
 
-const mapStateToProps = ({meeting,auth})=>({
+const mapStateToProps = ({meeting,auth,theme})=>({
     meeting,
-    user:auth.user
+    user:auth.user,
+    isDarkMode:theme.isDarkMode
 });
 
 export default connect(mapStateToProps,{fetchUserMeetings})(Meetings);

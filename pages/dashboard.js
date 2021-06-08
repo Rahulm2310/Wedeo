@@ -7,16 +7,16 @@ import BaseLayout from '../components/BaseLayout';
 import styles from '../styles/Dashboard.module.css';
 import JoinModal from '../components/JoinModal';
 import HostModal from '../components/HostModal';
-import Footer from '../components/Footer';
+// import Footer from '../components/Footer';
 
-const Dashboard = () => {
+const Dashboard = ({isDarkMode}) => {
     const [joinModalShow,setJoinModalShow] = useState(false);
     const [hostModalShow,setHostModalShow] = useState(false);
     return (
         <BaseLayout>
         <AuthContainer>
             <Navbar/>
-            <div className={styles.cards}>
+            <div className={`${styles.cards} ${isDarkMode?styles.cardsDark:""}`}>
                 <div className={`${styles.card} ${styles.joinCard}`} onClick={()=>{setHostModalShow(false);setJoinModalShow(true);}}>
                     <img className={styles.cardImage} src='/static/images/join-meet.svg'/>
                     <div className={styles.cardText}>Join a Meeting</div>
@@ -34,14 +34,14 @@ const Dashboard = () => {
             </div>
             <JoinModal show={joinModalShow} onClose={()=>{setJoinModalShow(false)}}/>
             <HostModal show={hostModalShow} onClose={()=>{setHostModalShow(false)}}/>
-            <Footer/>
+            {/* <Footer/> */}
         </AuthContainer>
         </BaseLayout>
     )
 }
 
-const mapStateToProps = ({auth})=>({
-
+const mapStateToProps = ({theme})=>({
+    isDarkMode:theme.isDarkMode
 });
 
 // const mapDispatchToProps = (dispatch)=>({

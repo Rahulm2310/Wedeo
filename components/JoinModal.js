@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { isValidMeeting } from '../redux/meeting/actions';
 import styles from '../styles/Modal.module.css';
 
-const JoinModal = ({show,onClose,isValidMeeting}) => {
+const JoinModal = ({show,onClose,isValidMeeting,isDarkMode}) => {
     const [meeting,setMeeting] = useState({id:'',password:''});
     const {id,password} = meeting;
     const Router = useRouter();
@@ -19,7 +19,7 @@ const JoinModal = ({show,onClose,isValidMeeting}) => {
         setMeeting({...meeting,[e.target.name]:e.target.value});
     }
     return show?(
-        <div className={styles.modalBack}>
+        <div className={`${styles.modalBack} ${isDarkMode?styles.modalBackDark:""}`}>
             <div className={styles.modal}>
             <form action="#" className={styles.form} onSubmit={onSubmitHandler}>
                 <i className={`fa fa-times ${styles.crossBtn}`} aria-hidden="true" onClick={onClose}></i>
@@ -34,5 +34,8 @@ const JoinModal = ({show,onClose,isValidMeeting}) => {
     ):null
 }
 
+const mapStateToProps = ({theme})=>({
+    isDarkMode:theme.isDarkMode
+});
 
-export default connect(null,{isValidMeeting})(JoinModal);
+export default connect(mapStateToProps,{isValidMeeting})(JoinModal);

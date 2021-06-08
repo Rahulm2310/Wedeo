@@ -10,7 +10,7 @@ let composeEnhancers = compose;
 
 if(isClient){
     if(typeof window!='undefined'){
-        composeEnhancers=window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__;
+        composeEnhancers=window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__||compose;
     }
     const { persistReducer } = require('redux-persist');
     const storage = require('redux-persist/lib/storage').default;

@@ -46,7 +46,7 @@ body {
 
 .rdtPicker {
   border-radius: 20px;
-  background: linear-gradient(to right, #34d2fa, #bcf0fc) !important;
+  background: linear-gradient(to right, #34d2fa, #bcf0fc);
   overflow: hidden !important;
   border: none !important;
 }

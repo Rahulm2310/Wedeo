@@ -21,6 +21,11 @@
   position: relative;
 }
 
+.modalBackDark .modal{
+  background: #222222;
+  color:#ccc;
+}
+
 .head {
   font-size: 24px;
   font-weight: 700;
@@ -39,12 +44,33 @@
   text-align: center;
 }
 
+.modalBackDark .form{
+  background:#222222;
+}
+
 .input {
   background-color: #eee;
   border: none;
   padding: 12px 15px;
   margin: 8px 0;
   width: 100%;
+}
+
+.modalBackDark .input{
+  background: #3a3a3a;
+  color:#ccc;
+}
+
+.modalBackDark .dateTimePicker input{
+  background: #3a3a3a;
+  color:#ccc;
+}
+
+.modalBackDark .dateTimePicker div:first-of-type{
+  background: #535353 !important;
+  color:#ccc !important;
+  box-shadow: 0px 0px 10px black;
+  padding:0px;
 }
 
 .button {
@@ -58,6 +84,10 @@
   letter-spacing: 1px;
   text-transform: uppercase;
   transition: transform 80ms ease-in;
+}
+
+.modalBackDark .button{
+  border:none;
 }
 
 .button:active {

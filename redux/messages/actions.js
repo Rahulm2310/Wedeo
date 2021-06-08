@@ -36,9 +36,8 @@ export const updateUsers = (user,self=false)=>(dispatch)=>{
             payload:user
         })
         if(!self){
-            dispatch(setAlert(`${user.name} has joined the meeting`,'info'));
+            dispatch(setAlert(`${user.name} has ${user.type=="join"?"joined":"left"} the meeting`,'info'));
         }
-
     } catch (error) {
         console.log(error);
         // dispatch(setAlert('Failed to send message','error'));
@@ -51,7 +50,7 @@ export const removeUser = (user)=>(dispatch)=>{
             type:REMOVE_USER,
             payload:user
         })
-        dispatch(setAlert(`${user.name} has left the meeting`,'info'));
+        // dispatch(setAlert(`${user.name} has left the meeting`,'info'));
     } catch (error) {
         console.log(error);
         // dispatch(setAlert('Failed to send message','error'));

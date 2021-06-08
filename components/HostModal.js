@@ -7,8 +7,9 @@ import { setAlert } from '../redux/alert/actions';
 import moment from 'moment';
 import Spinner from './Spinner';
 import {FacebookShareButton,FacebookIcon,WhatsappShareButton,WhatsappIcon,TelegramShareButton,TelegramIcon,LinkedinShareButton,LinkedinIcon} from 'react-share';
+import { toggleTheme } from '../redux/theme/actions';
 
-const HostModal = ({show,onClose,createMeeting,setAlert,loading,user,edit,mId,updateMeeting,meetings}) => {
+const HostModal = ({show,onClose,createMeeting,setAlert,loading,user,edit,mId,updateMeeting,meetings,isDarkMode}) => {
     const [meeting,setMeeting] = useState({title:'',datetime:new Date().toString(),id:'',password:''});
     const {title,datetime,id,password}=meeting;
     const [invite,setInvite] = useState("");
@@ -55,7 +56,7 @@ const HostModal = ({show,onClose,createMeeting,setAlert,loading,user,edit,mId,up
     }
 
     return show?(
-        <div className={styles.modalBack}>
+        <div className={`${styles.modalBack} ${isDarkMode?styles.modalBackDark:""}`}>
             <div className={styles.modal}>
             <form action="#" className={styles.form} onSubmit={onSubmitHandler}>
                 <i className={`fa fa-times ${styles.crossBtn}`} aria-hidden="true" onClick={onClose}></i>
@@ -63,7 +64,7 @@ const HostModal = ({show,onClose,createMeeting,setAlert,loading,user,edit,mId,up
                 {!loading ? (!id?(<div>
                 <span className={styles.span}>Enter Meeting Details</span>
                 <input name="title" value={title} className={styles.input} type="text" placeholder="Meeting Title" required onChange={onChangeMeetingData}/>
-                <DateTime value={new Date(datetime)} onChange={(date)=>{if(date._isValid){setMeeting({...meeting,datetime:date._d.toString()})}else{setAlert("Please select a valid meeting time.",'warning')}}}/>
+                <DateTime className={`${isDarkMode?styles.dateTimePicker:""}`} value={new Date(datetime)} onChange={(date)=>{if(date._isValid){setMeeting({...meeting,datetime:date._d.toString()})}else{setAlert("Please select a valid meeting time.",'warning')}}}/>
                 <button className={styles.button} type="submit">{!edit?'Create':'Update'}</button>
                 </div>):(<div><p className={styles.span}>Meeting Details</p><br/><p className={styles.span}><strong>Meeting ID</strong> : {id}</p><p className={styles.span}><strong>Meeting Password</strong> : {password}</p><br/><div className={styles.socialShare}><p className={styles.span}>Share meeting invite</p><WhatsappShareButton url={'https://localhost:3000'} title={invite}><WhatsappIcon size={40} borderRadius={20} /></WhatsappShareButton> <TelegramShareButton url={'https://localhost:3000'} title={invite}><TelegramIcon size={40} borderRadius={20}/></TelegramShareButton> <FacebookShareButton url={'https://localhost:3000'} quote={invite}><FacebookIcon size={40} borderRadius={20}/></FacebookShareButton> <LinkedinShareButton url={'https://localhost:3000'} source={'https://localhost:3000'} quote={invite}><LinkedinIcon size={40} borderRadius={20}/></LinkedinShareButton></div></div>)):<Spinner/>}
 		    </form>
@@ -72,10 +73,11 @@ const HostModal = ({show,onClose,createMeeting,setAlert,loading,user,edit,mId,up
     ):null
 }
 
-const mapStateToProps = ({meeting,auth})=>({
+const mapStateToProps = ({meeting,auth,theme})=>({
     loading:meeting.loading,
     user:auth.user,
-    meetings:meeting.meetings
+    meetings:meeting.meetings,
+    isDarkMode:theme.isDarkMode
 });
 
 export default connect(mapStateToProps,{createMeeting,setAlert,updateMeeting})(HostModal);

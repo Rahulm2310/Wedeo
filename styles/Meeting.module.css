@@ -325,14 +325,39 @@
   width: 93%;
 }
 
+.input .msgInput{
+  display: flex;
+  background:#eee;
+  align-items: center;
+  position: relative;
+  border-radius: 10px;
+  width:83%;
+}
+
+.input .msgInput aside{
+  position:absolute;
+  bottom:40px;
+  box-shadow: none;
+}
+
+.input .msgInput i{
+  font-size: 22px;
+  color:#999;
+}
+
+.input .msgInput i:hover{
+  color:#121212;
+  cursor: pointer;
+}
+
 .input input {
   padding: 7px 10px;
   background: #eee;
-  width: 85%;
   border-radius: 10px;
   border: none;
   outline: none;
   margin-right: 5px;
+  width:85%;
 }
 
 .sendBtn {

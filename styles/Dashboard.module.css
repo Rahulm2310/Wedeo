@@ -6,6 +6,10 @@
   padding-bottom: 40px;
 }
 
+.cardsDark{
+
+}
+
 .card {
   box-shadow: 0px 0px 10px #ccc;
   border-radius: 20px;
@@ -19,6 +23,11 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
+}
+
+.cardsDark .card{
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.897);
+  filter: grayscale(0.3);
 }
 
 .card:hover {

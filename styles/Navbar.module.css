@@ -1,5 +1,5 @@
 .navbar {
-  background-color: white !important;
+  background-color: white;
   border: none;
   padding: 10px 20px;
   width: 100%;
@@ -7,10 +7,19 @@
   box-shadow: 0px 0px 10px #ccc;
 }
 
+.navbarDark{
+  background-color: #121212;
+  box-shadow: 0px 0px 10px black;
+}
+
 .navbarBrand {
-  color: #000 !important;
+  color: #000;
   font-family: 'Lobster', cursive;
   font-size: 30px;
+}
+
+.navbarDark .navbarBrand{
+  color:#ccc;
 }
 
 .navLink a {
@@ -40,7 +49,17 @@
 }
 
 .user {
-  font-size: 22px;
+  font-size: 26px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.user a{
+  text-decoration: none;
+}
+
+.navbarDark .user{
+  color:#ccc;
 }
 
 .user span {
@@ -54,12 +73,160 @@
   border-radius: 20px;
   padding: 5px 10px;
   margin-left: 20px;
+  position: absolute;
+  bottom:10px;
 }
 
 .logOutBtn:hover {
   background: black;
   color: white;
 }
+
+.navbarDark .logOutBtn{
+  border-color: #ccc;
+  color:#ccc;
+}
+
+.navbarDark .logOutBtn:hover{
+  background: #ccc;
+  color:black;
+}
+
+/* dark mode button */
+.toggleModeCb {
+  display: none;
+}
+
+.toggleMode {
+  cursor: pointer;
+  margin:0px;
+  display: block;
+}
+
+.toggleMode .toggleBorder {
+  border: 1px solid #1e1f26;
+  width: 50px;
+  height: 20px;
+  display: block;
+  border-radius: 20px;
+  position: relative;
+}
+
+.toggleMode .toggleIndicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  position: absolute;
+  background-color: #1e1f26;
+  top: 1px;
+  left: 2px;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+  box-sizing: border-box;
+  
+}
+
+.toggleMode .toggleIndicator::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  position: absolute;
+  bottom: -3px;
+  right: 5px;
+  background-color: #1e1f26;
+}
+
+.modeWrapper {
+  transition: all 0.3s ease-in-out;
+  /* height: 100vh; */
+  position: relative;
+  font-family: sans-serif;
+}
+
+.modeWrapper .mode {
+  transition: all 0.3s ease-in-out;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.toggleModeCb:checked + .modeWrapper .toggleBorder {
+  border-color: white;
+}
+.toggleModeCb:checked + .modeWrapper .toggleIndicator {
+  background-color: white;
+  left: calc( 50px - 18px );
+  transform: rotate(180deg);
+}
+
+/* side bar menu */
+.sideNav {
+  height: 100%; /* 100% Full-height */
+  width: 0; /* 0 width - change this with JavaScript */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Stay on top */
+  top: 0;
+  right: 0;
+  background-color: white; /* Black*/
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 60px; /* Place content 60px from the top */
+  transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+  box-shadow: 0px 0px 10px #999;
+}
+
+.navbarDark .sideNav{
+  background-color:#222222;
+  box-shadow: 0px 0px 10px black;
+}
+
+/* The navigation menu links */
+.sideNav a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  font-family: Gotham;
+  color: #818181;
+  display: block;
+  transition: 0.3s
+}
+
+/* Position and style the close button (top right corner) */
+.sideNav .closeBtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  cursor: pointer;
+}
+
+.navbarDark .closeBtn{
+  color:#ccc;
+}
+
+.menuItem{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  border-top: 1px solid #ccc;
+  padding:10px;
+  cursor: pointer !important;
+}
+
+.navbarDark .menuItem{
+  color:#ccc;
+}
+
+.menuItem:hover{
+  background-color: #bbb;
+  color:#333;
+}
+.menuItem p{
+  margin:0px;
+}
+
 
 @media screen and (max-width: 500px) {
   .user span {
