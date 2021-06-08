@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {useRouter} from 'next/router';
-import dynamic from 'next/dynamic'
-import Head from 'next/head';
 import AuthContainer from '../components/AuthContainer';
 import BaseLayout from '../components/BaseLayout';
 import styles from '../styles/Meeting.module.css';
@@ -133,18 +131,21 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
             });
 
             const addVideoStream = (video,videoCard,stream)=>{
-                video.srcObject=stream;
-                video.addEventListener('loadedmetadata',()=>{
-                    video.play();
-                });
-                let videoGrid = document.getElementsByClassName('videos')[0]; 
-                if(videoGrid){              
-                    videoGrid.append(videoCard);
+                if(typeof window!="undefined"){
+                    video.srcObject=stream;
+                    video.addEventListener('loadedmetadata',()=>{
+                        video.play();
+                    });
+                    let videoGrid = document.getElementsByClassName('videos')[0]; 
+                    if(videoGrid){              
+                        videoGrid.append(videoCard);
+                    }
                 }
             }
 
             
             const connectToNewUser = (newuser,myStream)=>{
+                if(typeof window!="undefined"){
                 console.log("newuser joined event",newuser,myStream);
                 socket.emit("new-stream",{meetingId:query.id,stream:myStream.id,user:{id:user.uid, name:user.name}});
                 const call = myPeer.call(newuser.uid,myStream);
@@ -175,6 +176,7 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
 
                 peers[newuser.uid]=call;
             }
+            }
         
         }
     }
@@ -202,12 +204,15 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
     },[]);
 
     const fullScreenHandler = ()=>{
+        if(typeof window!="undefined"){
         if(isFullScreen){
             document.exitFullscreen();
         }else{
              document.getElementsByTagName('body')[0].requestFullscreen();
         }
+        
         setIsFullScreen(!isFullScreen);
+    }
     }
 
     const microphoneHandler = ()=>{
@@ -231,6 +236,7 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
     }
 
     const incomingAudioHandler = ()=>{
+        if(typeof window!="undefined"){
         const videos = document.querySelectorAll('video');
         if(isIncomingAudio){
             videos.forEach(v=>{
@@ -242,6 +248,7 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
             });
         }     
         setIsIncomingAudio(!isIncomingAudio);
+    }
     }
 
     const screenShareHandler = ()=>{
