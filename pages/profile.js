@@ -35,11 +35,13 @@ const Profile = ({user,profile,getProfile,updateProfile,setAlert,isDarkMode,dele
     }
 
     const uploadHandler = ()=>{
+      if(typeof window!=="undefined"){
         const fileInput = document.querySelector("#file-upload");
         fileInput.addEventListener('change',function(){
             onSelectImage(this);
         });
         fileInput.click();
+    }
     }
 
     const onSelectImage = async (input)=>{

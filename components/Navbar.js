@@ -12,12 +12,16 @@ const Navbar = ({profile,logoutUser,toggleTheme,isDarkMode})=> {
 
         /* Set the width of the side navigation to 250px */
     function openNav() {
-      document.getElementById("mySideNav").style.width = "300px";
+      if(typeof window!=="undefined"){
+        document.getElementById("mySideNav").style.width = "300px";
+      }
     }
 
     /* Set the width of the side navigation to 0 */
     function closeNav() {
-      document.getElementById("mySideNav").style.width = "0";
+      if(typeof window!=="undefined"){
+        document.getElementById("mySideNav").style.width = "0";
+      }
     }
 
     const toggleThemeHandler = ()=>{

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {useRouter} from 'next/router';
+import dynamic from 'next/dynamic';
 import AuthContainer from '../components/AuthContainer';
 import BaseLayout from '../components/BaseLayout';
 import styles from '../styles/Meeting.module.css';
@@ -13,7 +14,8 @@ import {io} from 'socket.io-client';
 import { clearMessages, updateMessages,updateUsers,removeUser,clearUsers } from '../redux/messages/actions';
 import { setAlert } from '../redux/alert/actions';
 import Linkify from 'react-linkify';
-import Picker from 'emoji-picker-react';
+const Picker = dynamic(() => import('emoji-picker-react'));
+const Peer = dynamic(() => import('peerjs'));
 
 const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessages,removeUser,updateUsers,clearUsers,messages,users,setAlert}) => {
     const router = useRouter();
@@ -71,7 +73,7 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
     //peerjs
     const setupVideoCall = async ()=>{
         if(typeof window!="undefined"){
-            const Peer = (await import('peerjs')).default;
+            // const Peer = (await import('peerjs')).default;
             const myPeer = new Peer(user.uid);
             myPeer.on('open',id=>{
                 console.log("my peer open");
@@ -399,9 +401,10 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
                             <div className={styles.msgInput}>
                             <input name="message" value={messageInput} onChange={(e)=>{setMessageInput(e.target.value)}} placeholder="Write your message here"/>
                             <i class="fa fa-smile-o" aria-hidden="true" onClick={()=>setEmojiPicker(!emojiPicker)}></i>
-                            {typeof window!="undefined" && emojiPicker &&
-                            <Picker onEmojiClick={emojiPickerHandler} />
-}
+                            { 
+                                typeof window!="undefined" && emojiPicker &&
+                                <Picker onEmojiClick={emojiPickerHandler} />
+                            }
                             </div>
                             <button disabled={messageInput.trim().length==0} className={styles.sendBtn} onClick={sendMessage}>
                             <i class="fa fa-paper-plane" aria-hidden="true"></i>
