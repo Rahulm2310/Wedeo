@@ -16,7 +16,6 @@ export const createMeeting = ({title,datetime})=>async(dispatch)=>{
         }
             const password = uuidv4().substring(0,8);
             const user=auth.currentUser;
-            console.log(user);
             const meeting = {id:id,title:title,datetime:datetime.toString(),createdAt:new Date().toString(),password:password,hostId:user.uid,hostName:user.displayName};
             await database.ref('/meetings/'+id).set(meeting);
             dispatch({

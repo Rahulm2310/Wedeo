@@ -20,7 +20,7 @@ app.prepare().then(()=>{
     io.on('connection',socket=>{
         socket.on('join-meet',(data)=>{
             const {meetingId, user}=data;
-            console.log(meetingId,user);
+            // console.log(meetingId,user);
             socket.join(meetingId);
             if(!sockets[meetingId]){
                 sockets[meetingId]=[];
