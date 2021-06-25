@@ -188,16 +188,18 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
 
     useEffect(()=>{
         const checkMeeting = async()=>{
-            const res = await isValidMeeting(query.id,query.password);
-            if(res.status===200){
-                const meet = res.data;
-                setMeeting(res.data);
-                setInvite(`*Wedeo Meeting Invitation* \n\n ${meet.hostName} is inviting you to attend a meeting. \n\n *Meeting Details* \n Title: ${meet.title} \n Timing : ${meet.datetime} \n ID : ${meet.id} \n Password : ${meet.password} \n\n\n Regards, \n *Team Wedeo*`);
-                //load meeting data
-                setupVideoCall();
-                setLoading(false);
-            }else{
-                router.push('/dashboard');
+            if(typeof window!="undefined"){
+                const res = await isValidMeeting(query.id,query.password);
+                if(res.status===200){
+                    const meet = res.data;
+                    setMeeting(res.data);
+                    setInvite(`*Wedeo Meeting Invitation* \n\n ${meet.hostName} is inviting you to attend a meeting. \n\n *Meeting Details* \n Title: ${meet.title} \n Timing : ${meet.datetime} \n ID : ${meet.id} \n Password : ${meet.password} \n\n\n Regards, \n *Team Wedeo*`);
+                    //load meeting data
+                    setupVideoCall();
+                    setLoading(false);
+                }else{
+                    router.push('/dashboard');
+                }
             }
         }
         checkMeeting();
@@ -205,14 +207,14 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
 
     const fullScreenHandler = ()=>{
         if(typeof window!="undefined"){
-        if(isFullScreen){
-            document.exitFullscreen();
-        }else{
-             document.getElementsByTagName('body')[0].requestFullscreen();
+            if(isFullScreen){
+                document.exitFullscreen();
+            }else{
+                document.getElementsByTagName('body')[0].requestFullscreen();
+            }
+            
+            setIsFullScreen(!isFullScreen);
         }
-        
-        setIsFullScreen(!isFullScreen);
-    }
     }
 
     const microphoneHandler = ()=>{
