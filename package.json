@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@netlify/plugin-nextjs": "^3.4.2",
     "emoji-picker-react": "^3.4.2",
     "express": "^4.17.1",
     "firebase": "^8.2.2",
