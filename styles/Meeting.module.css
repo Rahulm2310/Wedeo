@@ -149,6 +149,7 @@
 }
 
 .videos {
+  width:20%;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -156,15 +157,29 @@
   height: 100%;
 }
 
-.videoCard {
-  width: 220px;
-  height: 200px;
+.screenShareCard{
+  width:70%;
+  height:80%;
   background: grey;
   border-radius: 20px;
   margin-right: 10px;
   margin-bottom: 10px;
   position: relative;
   overflow: hidden;
+  display: none;
+}
+
+.videoCard {
+  width: 220px;
+  height: 200px;
+  background-image: url(https://www.medtalks.com/images/user-placeholder.jpg);
+  border-radius: 20px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+  background-position: center;
+  background-size: cover;
 }
 
 .videoCard video {
@@ -204,11 +219,13 @@
   bottom: 10px;
   justify-content: center;
   left: 30%;
+  z-index: 1;
 }
 
 .controlBtn {
   /* width: 40px; */
   /* height: 40px; */
+  position:relative;
   border-radius: 20px;
   background: #ccc;
   cursor: pointer;
@@ -216,6 +233,28 @@
   font-size: 20px;
   margin-left: 5px;
   margin-right: 5px;
+}
+
+.controlBtn:hover .tooltip{
+  display: flex;
+}
+
+.tooltip{
+  position: absolute;
+  bottom:50px;
+  background:#000;
+  color:#fff;
+  padding:5px 7px;
+  border-radius: 5px;
+  font-size: 12px;
+  width: fit-content;
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+  left: -2px;
+  display: none;
+  transition: 0.2s ease-in-out all;
+  z-index: 1;
 }
 
 .leaveBtn {

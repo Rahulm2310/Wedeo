@@ -14,10 +14,11 @@ import {io} from 'socket.io-client';
 import { clearMessages, updateMessages,updateUsers,removeUser,clearUsers } from '../redux/messages/actions';
 import { setAlert } from '../redux/alert/actions';
 import Linkify from 'react-linkify';
-const Picker = dynamic(() => import('emoji-picker-react'));
-const Peer = dynamic(() => import('peerjs'));
+import {v4 as uuidv4} from 'uuid';
+const Picker = dynamic(() => import('emoji-picker-react'),{ssr:false});
+// const Peer = dynamic(() => import('peerjs'));
 
-const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessages,removeUser,updateUsers,clearUsers,messages,users,setAlert}) => {
+const Meeting = ({isValidMeeting,query,endMeeting,user,profile,clearMessages,updateMessages,removeUser,updateUsers,clearUsers,messages,users,setAlert}) => {
     const router = useRouter();
     const [meeting,setMeeting] = useState(null);
     const [loading,setLoading] = useState(true);
@@ -32,12 +33,17 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
     const [messageInput,setMessageInput] = useState('');
     const [myVideoStream,setMyVideoStream] = useState(null);
     const [emojiPicker,setEmojiPicker] = useState(false);
-
+    const [isScreenSharing, setIsScreenSharing] = useState(false);
+    const [myScreenStream, setMyScreenStream] = useState(null);
+    const [isScreenRecording,setIsScreenRecording] = useState(false);
+ 
+    let recordedStream = [];
+    const [mediaRecorder, setMediaRecorder] = useState(null);
     const peers = {};
-    let streams={};
+    
 
     //socket.io
-    const socket = io('/');
+    const socket = io();
 
     socket.on('user-left',(user)=>{
         if(peers[user.uid]){
@@ -59,21 +65,42 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
             updateMessages(msg);
         });
 
-        socket.on('update-streams',strms=>{
-            console.log("updating streams",strms);
-            streams=strms;
-        });
+
+        // socket.on("stop-screen-share-now",()=>{
+        //     const myVideo = document.querySelector('.screen-share video');
+        //     myVideo.muted=true;
+
+        //     const p = document.querySelector('.screen-share-footer p');
+        //     p.textContent= "";
+        
+        //     const videoCard = document.getElementsByClassName('screen-share')[0];
+        //     // addScreenShareStream(myVideo, myVideoCard, stream);
+        //     myVideo.srcObject=null;
+        //     videoCard.style.display="none";
+        // });
+
+        // socket.on('update-streams',strms=>{
+        //     console.log("updating streams",strms);
+        //     streams=strms;
+        // });
 
         return (()=>{
+            if(isScreenSharing){
+                stopScreenSharing();
+            }
             leaveMeetingHandler();
             console.log("use effect cleanup");
         });
     },[])
 
+    const userMediaAvailable = ()=> {
+        return !!( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia );
+    }
+
     //peerjs
     const setupVideoCall = async ()=>{
         if(typeof window!="undefined"){
-            // const Peer = (await import('peerjs')).default;
+            const Peer = (await import('peerjs')).default;
             const myPeer = new Peer(user.uid);
             myPeer.on('open',id=>{
                 console.log("my peer open");
@@ -81,6 +108,7 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
             });
             
             const myVideo = document.createElement('video');
+            myVideo.classList.add("local");
             myVideo.muted=true;
 
             const footer=document.createElement('div');
@@ -90,47 +118,96 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
             footer.append(p);
         
             const myVideoCard = document.createElement('div');
+            myVideoCard.style.backgroundImage="url(https://www.medtalks.com/images/user-placeholder.jpg)";
             myVideoCard.classList.add([`${styles.videoCard}`]);
             myVideoCard.append(myVideo);
             myVideoCard.append(footer);
+
+            // myVideo.onclose(()=>{
+            //     video.style.display="none";
+            // });
     
+            if(userMediaAvailable()){
             navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(stream=>{
                 setMyVideoStream(stream);
                 addVideoStream(myVideo,myVideoCard,stream);
                 updateUsers({uid:user.uid,name:user.name,type:"join",datetime:new Date()},true);
                 myPeer.on('call',(call)=>{
-                    if(!peers[user.uid]){
-                        // socket.emit("new-stream",{meetingId:query.id,stream:stream.id, user: {uid:user.uid, name:user.name}});
-                        call.answer(stream);
+                    console.log("Calling...",call.metadata);
+                    call.answer(stream);
+                    if(!peers[call.metadata.user.uid]){
                         const video = document.createElement('video');
                         video.muted=true;
     
                         const footer=document.createElement('div');
                         footer.classList.add([`${styles.footer}`]);
                         const p = document.createElement('p');
-                        p.textContent=user.name;
+                        p.textContent=call.metadata.user.name;
                         footer.append(p);
     
                         const videoCard = document.createElement('div');
+                        videoCard.style.backgroundImage="url(https://www.medtalks.com/images/user-placeholder.jpg)";
                         videoCard.classList.add([`${styles.videoCard}`]);
                         videoCard.append(video);
                         videoCard.append(footer);
+
+                        // video.on('close')
+                        // video.onpause(()=>{
+                        //     video.style.display="none";
+                        // });
+
+                        // video.on('close',()=>{
+                        //     video.style.display="none";
+                        // });
     
                         call.on('stream',(userVideoStream)=>{
-                            console.log("my peer call on stream", userVideoStream, streams[userVideoStream.id]);
-                            p.textContent=streams[userVideoStream.id].name;
                             addVideoStream(video,videoCard,userVideoStream);
                         });
-                        peers[user.uid]=call;
+
+                        call.on('close',()=>{
+                            videoCard.remove();
+                            delete peers[call.metadata.user.uid];
+                        });
+
                     }
+                    peers[call.metadata.user.uid]=call;
                 })
 
                 socket.on('user-joined',user=>{
-                    console.log("user joined event");
+                    console.log(user.name + " has joined the meeting");
                     connectToNewUser(user,stream);
                     updateUsers({...user,type:"join",datetime:new Date()});
                 });
+
+                socket.on('new-screen-share',data=>{
+                    const call = myPeer.call(data.user.uid,stream,{metadata:{user:{uid:data.user.uid,name:data.user.name}}});
+                    
+                    call.on('stream',userVideoStream=>{
+                        console.log(data.user.name+ " sharing his screen", userVideoStream);
+                        const myVideo = document.querySelector('.screen-share video');
+                        myVideo.muted=true;
+
+                        const footer=document.querySelector('.screen-share-footer');
+                        const p = document.querySelector('.screen-share-footer p');
+                        p.textContent=data.user.name;
+                    
+                        const videoCard = document.getElementsByClassName('screen-share')[0];
+                        myVideo.srcObject=userVideoStream;
+                        myVideo.addEventListener('loadedmetadata',()=>{
+                            myVideo.play();
+                        });
+                        videoCard.style.display="block";
+                    });
+
+                    call.on('close',()=>{
+                        stream.getTracks().forEach((track)=>{
+                            track.stop();
+                        });
+                        videoCard.style.display="none";
+                    });
+                });
             });
+        }
 
             const addVideoStream = (video,videoCard,stream)=>{
                 if(typeof window!="undefined"){
@@ -144,42 +221,48 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
                     }
                 }
             }
-
             
             const connectToNewUser = (newuser,myStream)=>{
                 if(typeof window!="undefined"){
                 console.log("newuser joined event",newuser,myStream);
-                socket.emit("new-stream",{meetingId:query.id,stream:myStream.id,user:{id:user.uid, name:user.name}});
-                const call = myPeer.call(newuser.uid,myStream);
-                const video = document.createElement('video');
-                video.muted=true;
-                
-                const footer=document.createElement('div');
-                footer.classList.add([`${styles.footer}`]);
-                const p = document.createElement('p');
-                p.textContent=newuser.name;
-                footer.append(p);
+                // socket.emit("new-stream",{meetingId:query.id,stream:myStream.id,user:{id:user.uid, name:user.name}});
+                const call = myPeer.call(newuser.uid,myStream,{metadata:{user:{uid:user.uid,name:user.name,image:profile?profile.image:""}}});
+                if(!peers[newuser.uid]){
+                    const video = document.createElement('video');
+                    video.muted=true;
 
-                const videoCard = document.createElement('div');
-                videoCard.classList.add([`${styles.videoCard}`]);
-                videoCard.append(video);
-                videoCard.append(footer);
+                    const footer=document.createElement('div');
+                    footer.classList.add([`${styles.footer}`]);
+                    const p = document.createElement('p');
+                    p.textContent=newuser.name;
+                    footer.append(p);
 
-                call.on('stream',userVideoStream=>{
-                    addVideoStream(video,videoCard,userVideoStream);
-                });
+                    const videoCard = document.createElement('div');
+                    videoCard.style.backgroundImage="url(https://www.medtalks.com/images/user-placeholder.jpg)";
+                    videoCard.classList.add([`${styles.videoCard}`]);
+                    videoCard.append(video);
+                    videoCard.append(footer);
 
-                call.on('close',()=>{
-                    myStream.getTracks().forEach((track)=>{
-                        track.stop();
+                    call.on('stream',userVideoStream=>{
+                        addVideoStream(video,videoCard,userVideoStream);
+
+                        // video.onclose(()=>{
+                        //     video.style.display="none";
+                        // });
                     });
-                    videoCard.remove();
-                })
 
+                    call.on('close',()=>{
+                        console.log(newuser.name + " close peer ");
+                        // myStream.getTracks().forEach((track)=>{
+                        //     track.stop();
+                        // });
+                        videoCard.remove();
+                        delete peers[newuser.uid];
+                    })
+                }
                 peers[newuser.uid]=call;
             }
             }
-        
         }
     }
 
@@ -255,10 +338,138 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
     }
     }
 
-    const screenShareHandler = ()=>{
-        navigator.mediaDevices.getDisplayMedia().then(stream=>{
-            setMyVideoStream(stream);
-        });
+    const screenShareHandler = async ()=>{
+        if(!isScreenSharing){
+                const Peer = (await import('peerjs')).default;
+                const screenUserId = new uuidv4();
+                const myScreenPeer = new Peer(screenUserId);
+                socket.emit('screen-share',{meetingId:query.id,user:{uid:screenUserId,name:user.name+"'s Screen"}});
+                myScreenPeer.on('open',id=>{
+                    console.log("my screen sharing peer open");
+                });
+
+            navigator.mediaDevices.getDisplayMedia({
+                video: {
+                    cursor: "always"
+                },
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    sampleRate: 44100
+                }
+            }).then(stream=>{
+                console.log("screen sharing started...");
+                myScreenPeer.on('call',(call)=>{
+                    console.log(call.metadata.user.name+" calling...");
+                    // if(!peers[user.uid]){
+                        // socket.emit("new-stream",{meetingId:query.id,stream:stream.id, user: {uid:user.uid, name:user.name}});
+                        call.answer(stream);
+                    // }
+                })
+
+                const myVideo = document.querySelector('.screen-share video');
+                myVideo.muted=true;
+
+                const footer=document.querySelector('.screen-share-footer');
+                const p = document.querySelector('.screen-share-footer p');
+                p.textContent='Your Screen';
+            
+                const videoCard = document.getElementsByClassName('screen-share')[0];
+                myVideo.srcObject=stream;
+                myVideo.addEventListener('loadedmetadata',()=>{
+                    myVideo.play();
+                });
+                videoCard.style.display="block";
+                setMyScreenStream(stream);
+                setIsScreenSharing(true);
+
+                stream.getVideoTracks()[0].addEventListener( 'ended', () => {
+                    stopScreenSharing();
+                } );
+            });
+        }else{
+            stopScreenSharing();   
+        }
+    }
+
+    const stopScreenSharing = async ()=>{
+        socket.emit("stop-screen-share",{meetingId:query.id});
+        if(myScreenStream){
+           await myScreenStream.getTracks().forEach( track => track.stop() );
+        }
+        let videoCard = document.getElementsByClassName('screen-share')[0]; 
+        videoCard.style.display="none";
+        setIsScreenSharing(false);
+        setMyScreenStream(null);
+    }
+
+    const screenRecordingHandler = ()=>{
+        if(!isScreenRecording){
+            if(userMediaAvailable()){
+                navigator.mediaDevices.getDisplayMedia({
+                    video: {
+                        cursor: "always"
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        sampleRate: 44100
+                    }
+                }).then(stream=>{
+                    const recorder = new MediaRecorder( stream, {
+                        mimeType: 'video/webm;codecs=vp9'
+                    } );
+                    setMediaRecorder(recorder);
+
+                    recorder.start( 1000 );
+
+                    recorder.ondataavailable = function ( e ) {
+                        console.log("video recording data...",recordedStream, e);
+                        // setRecordedStream([...recordedStream, e.data]);
+                        recordedStream.push(e.data);
+                    };
+
+                    recorder.onstop = function () {
+                        setIsScreenRecording(false);
+                        console.log("video recording stopped!!!",recordedStream);
+                        saveRecordedStream( recordedStream, meeting.title );
+
+                        setTimeout( () => {
+                            recordedStream=[];
+                        }, 3000 );
+                    };
+
+                    recorder.onerror = function ( e ) {
+                        console.error( e );
+                    };
+                    setIsScreenRecording(true);
+            });
+        }
+        }else{
+            if(mediaRecorder){
+                mediaRecorder.stop();
+            }
+            setIsScreenRecording(false);
+        }
+    }
+
+    const saveRecordedStream = ( stream, meetingTitle ) => {
+        let file = new Blob( stream, { type: 'video/webm' } );
+        const filename =  `${ meetingTitle }-${ moment().unix() }-record.webm` ;
+        if (window.navigator.msSaveOrOpenBlob) // IE10+
+            window.navigator.msSaveOrOpenBlob(file, filename);
+    else { // Others
+            const a = document.createElement("a");
+            const url = URL.createObjectURL(file);
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);  
+            }, 0); 
+    }
     }
 
     const chatHandler = ()=>{
@@ -291,6 +502,11 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
     const leaveMeetingHandler = ()=>{
         if(myVideoStream){
             myVideoStream.getTracks().forEach((track)=>{
+                track.stop();
+            });
+        }
+        if(isScreenSharing){
+            myScreenStream.getTracks().forEach((track)=>{
                 track.stop();
             });
         }
@@ -338,41 +554,62 @@ const Meeting = ({isValidMeeting,query,endMeeting,user,clearMessages,updateMessa
                     }
                 </div>
                 <div className={styles.meeting}>
-                    <div className={styles.videoBox}>
+                    <div className={`${styles.videoBox} videoBox`}>
+                        <div className={`${styles.screenShareCard} screen-share`}>
+                            <video></video>
+                            <div className={`${styles.footer} screen-share-footer`}>
+                                <p></p>
+                            </div>
+                        </div>
                         <div className={`${styles.videos} videos`}>
                         </div>
                         <div className={styles.controls}>
                             <div className={styles.controlBtn} onClick={fullScreenHandler}>
+                                <span className={styles.tooltip}>Full Screen</span>
                                {!isFullScreen ? <i class="fas fa-arrows-alt" aria-hidden="true"></i>:
                                 <i class="fas fa-compress-arrows-alt" aria-hidden="true"></i>}
                             </div>
                             <div className={styles.controlBtn} onClick={microphoneHandler}>
+                            <span className={styles.tooltip}>Audio</span>
                                 {!isMic ? <i class="fa fa-microphone-slash" aria-hidden="true"></i>:
                                 <i class="fa fa-microphone" aria-hidden="true"></i>
     }
                             </div>
                             <div className={styles.controlBtn} onClick={videoHandler}>
+                            <span className={styles.tooltip}>Video</span>
                                 {!isVideo? <i class="fas fa-video-slash"></i>:
                                 <i class="fa fa-video-camera" aria-hidden="true"></i>}
                             </div>
                             <div className={styles.controlBtn} onClick={incomingAudioHandler}>
+                            <span className={styles.tooltip}>Mute</span>
                                 {!isIncomingAudio? <i class="fas fa-volume-mute"></i>:
                                 <i class="fa fa-volume-up" aria-hidden="true"></i>
 }
                             </div>
                             <div className={styles.controlBtn} onClick={screenShareHandler}>
-                            <i class="fa fa-desktop" aria-hidden="true"></i>
+                            <span className={styles.tooltip}>Screen Share</span>
+                            {!isScreenSharing?<i class="fa fa-desktop" aria-hidden="true"></i>:
+                            <i class="fa fa-times" aria-hidden="true"></i>}
                             </div>
+                            <div className={styles.controlBtn} onClick={screenRecordingHandler}>
+                            <span className={styles.tooltip}>Record Screen</span>
+                            {!isScreenRecording?<i class="fa fa-play-circle" aria-hidden="true"></i>:
+                            <i class="fa fa-stop-circle" aria-hidden="true"></i>}
+                            </div>
+                            
                             <div className={styles.controlBtn} onClick={chatHandler}>
+                            <span className={styles.tooltip}>Chat</span>
                                 {!isChat? <i class="fas fa-comment-slash"></i>:
                                 <i class="fas fa-comment"></i>
 }
                             </div>
                             <div className={`${styles.controlBtn} ${styles.leaveBtn}`} onClick={leaveMeetingHandler}>
+                            <span className={styles.tooltip}>Leave Meeting</span>
                                 <i class="fa fa-phone" aria-hidden="true"></i>
                             </div>
                             {meeting.hostId===user.uid && <>
                             <div className={`${styles.controlBtn} ${styles.endMeeting}`} onClick={()=>{setShowDialog(true)}}>
+                            <span className={styles.tooltip}>End Meeting</span>
                                 {typeof window.orientation!='undefined'? 'End': 'End Meeting'}
                             </div>
                             <DialogBox show={showDialog} question={'Are you sure you want to end this meeting for all?'} clickOk={endMeetingHandler} clickCancel={()=>{setShowDialog(false)}} />
@@ -427,10 +664,11 @@ Meeting.getInitialProps = async ({query}) => {
     return {query:query};
 }
 
-const mapStateToProps=({auth,messages})=>({
+const mapStateToProps=({auth,messages, profile})=>({
     user:auth.user,
     messages:messages.messages,
-    users:messages.users
+    users:messages.users,
+    profile:profile.data,
 });
 
 export default connect(mapStateToProps,{isValidMeeting,endMeeting,updateMessages,clearMessages,updateUsers,clearUsers,removeUser,setAlert})(Meeting);

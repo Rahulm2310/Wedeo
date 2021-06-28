@@ -15,7 +15,8 @@ app.prepare().then(()=>{
     });
 
     let sockets = {};
-    let streams = {};
+    let connectedPeers = [];
+    // let streams = {};
 
     io.on('connection',socket=>{
         socket.on('join-meet',(data)=>{
@@ -25,6 +26,7 @@ app.prepare().then(()=>{
             if(!sockets[meetingId]){
                 sockets[meetingId]=[];
             }
+            connectedPeers.push(user);
             sockets[meetingId].push(socket);
             socket.to(meetingId).broadcast.emit('user-joined',user);
 
@@ -37,10 +39,13 @@ app.prepare().then(()=>{
             
         });
 
-        socket.on('new-stream',(data)=>{
-            console.log("new stream",data);
-            streams[data.stream]=data.user;
-            socket.to(data.meetingId).emit("update-streams",streams);
+        socket.on("screen-share", (data)=>{
+            console.log("screen share by ",data.user.name);
+            socket.to(data.meetingId).broadcast.emit("new-screen-share",data);
+        });
+
+        socket.on("stop-screen-share",(data)=>{
+            socket.to(data.meetingId).broadcast.emit("stop-screen-share-now");
         });
 
         socket.on('send-message',(meetingId,msg)=>{
