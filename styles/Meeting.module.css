@@ -149,7 +149,7 @@
 }
 
 .videos {
-  width:20%;
+  /* width:20%; */
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -169,6 +169,11 @@
   display: none;
 }
 
+.screenShareCard video{
+  width: 100%;
+  height: 100%;
+}
+
 .videoCard {
   width: 220px;
   height: 200px;
@@ -185,6 +190,8 @@
 .videoCard video {
   object-fit: cover;
   position: absolute;
+  height:100%;
+  width: 100%;
 }
 
 .footer {
